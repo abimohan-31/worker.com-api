@@ -27,7 +27,9 @@ export const getAllBookings = async (req, res) => {
       limit,
       bookings,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
 };
 
 // Get a booking by Id
@@ -51,7 +53,9 @@ export const getBookingById = async (req, res) => {
     if (!booking) return res.status(404).json({ Message: "Booking not found" });
 
     res.status(200).json(booking);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
 };
 
 // Create a booking
@@ -64,7 +68,9 @@ export const createBooking = async (req, res) => {
       Message: "booking created successfully",
       booking: savedBooking,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
 };
 
 // Update a booking by Id
@@ -86,7 +92,9 @@ export const updateBooking = async (req, res) => {
       Message: "booking updated successfully",
       booking: updatedBooking,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
 };
 
 // Delete a booking by Id
@@ -99,5 +107,7 @@ export const deleteBooking = async (req, res) => {
       Message: "booking removed successfully",
       deletedBooking: booking,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
 };
