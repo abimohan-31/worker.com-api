@@ -4,7 +4,7 @@ import cors from "cors";
 import { defaultError, notFound } from "./middleware/ErrorHandlers.js";
 
 // Import route groups
-import authRouter from "./routes/authRoutes.js";
+import usersRouter from "./src/routes/usersRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import providerRouter from "./routes/providerRoutes.js";
 import customerRouter from "./routes/customerRoutes.js";
@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 connectDB();
 
 // API Routes
-app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/provider", providerRouter);
 app.use("/api/customer", customerRouter);
