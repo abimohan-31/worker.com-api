@@ -3,9 +3,7 @@ import dotenv from "dotenv";
 
 // Import models
 import User from "./src/models/User.js";
-import Provider from "./src/models/Provider.js";
-import Customer from "./src/models/Customer.js";
-// Removed: Booking, Review, Item modules in new architecture
+
 
 // Load environment variables
 dotenv.config();
@@ -37,7 +35,8 @@ const clearCollections = async () => {
     await User.deleteMany({});
     await Provider.deleteMany({});
     await Customer.deleteMany({});
-    // Removed collections (bookings, reviews, items)
+    await Subscription.deleteMany({});
+    await Review.deleteMany({});
     console.log("Collections cleared successfully!");
   } catch (error) {
     console.error("Error clearing collections:", error);
@@ -90,8 +89,6 @@ const seedDatabase = async () => {
     console.log(" Database seeded successfully!");
     console.log(" Test Credentials:");
     console.log("Admin: admin@example.com / admin123");
-    console.log("Provider: john.smith@example.com / provider123");
-    console.log("Customer: alice.anderson@example.com / customer123");
     console.log("");
 
     // Close connection
