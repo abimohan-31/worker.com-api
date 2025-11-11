@@ -1,15 +1,9 @@
 import mongoose from "mongoose";
-import Booking from "./Booking.js";
 import Customer from "./Customer.js";
 import Provider from "./Provider.js";
 
 const reviewSchema = new mongoose.Schema(
   {
-    booking_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: Booking,
-      required: [true, "Booking ID is required"],
-    },
     customer_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: Customer,
@@ -41,5 +35,3 @@ const reviewSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("Review", reviewSchema);
-
-

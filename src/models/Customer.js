@@ -21,15 +21,7 @@ const customerSchema = new mongoose.Schema(
       maxlength: [15, "Password cannot exceed 15 characters"],
       select: false,
     },
-    phone: {
-      type: String,
-      required: [true, "Phone number is required"],
-      match: [/^\d{10}$/, "Phone number must be 10 digits"],
-    },
-    address: {
-      type: String,
-      required: [true, "Address is required"],
-    },
+   
     role: {
       type: String,
       enum: ["admin", "provider", "customer"],

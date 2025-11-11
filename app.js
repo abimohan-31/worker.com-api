@@ -1,13 +1,16 @@
 import express from "express";
-import connectDB from './src/config/db.js';
+import connectDB from "./src/config/db.js";
 import cors from "cors";
 import { defaultError, notFound } from "./src/middleware/ErrorHandlers.js";
 
 // Import route groups
 import usersRouter from "./src/routes/usersRoutes.js";
-import adminRouter from "./src/routes/adminRoutes.js";
-import providerRouter from "./src/routes/providerRoutes.js";
-import customerRouter from "./src/routes/customerRoutes.js";
+import adminsRouter from "./src/routes/adminsRoutes.js";
+import customersRouter from "./src/routes/customersRoutes.js";
+import providersRouter from "./src/routes/providersRoutes.js";
+import subscriptionsRouter from "./src/routes/subscriptionsRoutes.js";
+import reviewsRouter from "./src/routes/reviewsRoutes.js";
+import servicesRouter from "./src/routes/servicesRoutes.js";
 
 // Initialize express
 const app = express();
@@ -27,9 +30,12 @@ connectDB();
 
 // API Routes
 app.use("/api/users", usersRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/provider", providerRouter);
-app.use("/api/customer", customerRouter);
+app.use("/api/admins", adminsRouter);
+app.use("/api/customers", customersRouter);
+app.use("/api/providers", providersRouter);
+app.use("/api/subscriptions", subscriptionsRouter);
+app.use("/api/reviews", reviewsRouter);
+app.use("/api/services", servicesRouter);
 
 // Page not found
 app.use(notFound);

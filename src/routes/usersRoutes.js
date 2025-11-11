@@ -1,27 +1,28 @@
 import express from "express";
-import { authenticate } from "../middleware/authMiddleware.js";
-import { authorize } from "../middleware/authorizeMiddleware.js";
+import { verifyToken, verifyRole } from "../middleware/authMiddleware.js";
 import {
   register,
   login,
-  createUser,
+  logout,
   getUserById,
   updateUser,
   deleteUser,
-} from "../controllers/UsersController.js";
+  createUser,
+} from "../controllers/usersController.js";
 
 const usersRouter = express.Router();
 
-// Public
+// Public routes
 usersRouter.post("/register", register); // provider & customer
 usersRouter.post("/login", login); // all roles
 
-// Admin only
-usersRouter.post("/create", authenticate, authorize("admin"), createUser);
+// Protected routes
+usersRouter.post("/logout", verifyToken, logout); // all authenticated users
+usersRouter.get("/:id", verifyToken, getUserById); // all authenticated users
+usersRouter.put("/:id", verifyToken, updateUser); // all authenticated users (can update own profile)
 
-// Basic user management (protected)
-usersRouter.get("/:id", authenticate, getUserById);
-usersRouter.put("/:id", authenticate, updateUser);
-usersRouter.delete("/:id", authenticate, authorize("admin"), deleteUser);
+// Admin only routes
+usersRouter.post("/create", verifyToken, verifyRole("admin"), createUser); // admin only
+usersRouter.delete("/:id", verifyToken, verifyRole("admin"), deleteUser); // admin only
 
 export default usersRouter;
