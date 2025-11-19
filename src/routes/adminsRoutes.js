@@ -46,7 +46,7 @@ adminsRouter.get("/customers/:id", getCustomerById);
 adminsRouter.delete("/customers/:id", deleteCustomer);
 
 // Admin management
-adminsRouter.get("/admins", getAllAdmins);
+// adminsRouter.get("/admins", getAllAdmins);
 
 // Subscriptions
 adminsRouter.get("/subscriptions", getAllSubscriptions);

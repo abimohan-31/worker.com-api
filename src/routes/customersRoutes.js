@@ -11,7 +11,11 @@ import {
   deleteReview,
   updateReview,
 } from "../controllers/reviewsController.js";
-import { getProvidersByService } from "../controllers/servicesController.js";
+import {
+  getAllServices,
+  getProvidersByService,
+  getServiceById,
+} from "../controllers/servicesController.js";
 
 const customersRouter = express.Router();
 
@@ -26,8 +30,9 @@ customersRouter.put("/profile", updateProfile);
 // Provider viewing routes
 customersRouter.get("/providers", getAllProviders);
 customersRouter.get("/providers/:id", getProviderById);
+customersRouter.get("/services", getAllServices);
+customersRouter.get("/services/:id", getServiceById);
 customersRouter.get("/services/:id/providers", getProvidersByService);
-
 
 //Review Create, update, delete routes (customer)
 customersRouter.post("/reviews", createReview);

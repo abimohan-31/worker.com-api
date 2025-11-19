@@ -1,34 +1,39 @@
 import Subscription from "../models/Subscription.js";
 import Provider from "../models/Provider.js";
+import { queryHelper } from "../utils/queryHelper.js";
 
-// GET /api/subscriptions - Get all subscriptions (admin only)
+// GET /api/subscriptions - Get subscriptions
+// Admin: See all subscriptions
+// Provider: See only their own subscriptions
+// Customer/Public: No access (handled by route middleware)
 export const getAllSubscriptions = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, q = "" } = req.query;
+    let defaultFilters = {};
 
-    const filter = {
-      $or: [{ plan_name: { $regex: q } }],
-    };
-    const subscriptions = await Subscription.find(filter)
-      .populate("provider_id", "name email")
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+    // Role-based filtering
+    if (req.user.role === "provider") {
+      // Providers can only see their own subscriptions
+      defaultFilters.provider_id = req.user.id;
+    }
+    // Admin sees all (no default filter)
 
-    const total = await Subscription.countDocuments(filter);
+    const { data, pagination } = await queryHelper(
+      Subscription,
+      req.query,
+      ["plan_name"], // Search fields
+      {
+        defaultFilters,
+        populate: {
+          path: "provider_id",
+          select: "name email",
+        },
+      }
+    );
 
     return res.status(200).json({
       success: true,
-      statusCode: 200,
-      data: {
-        subscriptions,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      },
+      data,
+      pagination,
     });
   } catch (error) {
     next(error);
@@ -36,6 +41,8 @@ export const getAllSubscriptions = async (req, res, next) => {
 };
 
 // GET /api/subscriptions/:id - Get subscription by ID
+// Admin: Can view any subscription
+// Provider: Can only view their own subscription
 export const getSubscriptionById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -53,17 +60,17 @@ export const getSubscriptionById = async (req, res, next) => {
       });
     }
 
-    // Check if user is admin or the subscription belongs to the provider
-    if (
-      req.user.role !== "admin" &&
-      subscription.provider_id._id.toString() !== req.user.id
-    ) {
-      return res.status(403).json({
-        success: false,
-        statusCode: 403,
-        message: "Access denied. You can only view your own subscription.",
-      });
+    // Access control: Providers can only view their own subscriptions
+    if (req.user.role === "provider") {
+      if (subscription.provider_id._id.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          statusCode: 403,
+          message: "Access denied. You can only view your own subscription.",
+        });
+      }
     }
+    // Admin can view any subscription
 
     return res.status(200).json({
       success: true,
@@ -80,8 +87,9 @@ export const getSubscriptionById = async (req, res, next) => {
 // POST /api/subscriptions - Create subscription (admin only)
 export const createSubscription = async (req, res, next) => {
   try {
-    const { provider_id, plan_name, end_date, amount } = req.body;
+    const { provider_id, plan_name, start_date, end_date, renewal_date, status, amount } = req.body;
 
+    // Validation
     if (!provider_id) {
       return res.status(400).json({
         success: false,
@@ -109,7 +117,7 @@ export const createSubscription = async (req, res, next) => {
       });
     }
 
-    if (!amount) {
+    if (amount === undefined || amount === null) {
       return res.status(400).json({
         success: false,
         statusCode: 400,
@@ -131,9 +139,11 @@ export const createSubscription = async (req, res, next) => {
     const subscription = new Subscription({
       provider_id,
       plan_name,
+      start_date: start_date || new Date(),
       end_date,
+      renewal_date,
+      status: status || "Active",
       amount,
-      status: "Active",
     });
 
     await subscription.save();
@@ -168,7 +178,7 @@ export const createSubscription = async (req, res, next) => {
 export const updateSubscription = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { plan_name, end_date, status, amount, renewal_date } = req.body;
+    const { plan_name, start_date, end_date, renewal_date, status, amount } = req.body;
 
     const subscription = await Subscription.findById(id);
 
@@ -180,11 +190,13 @@ export const updateSubscription = async (req, res, next) => {
       });
     }
 
+    // Update fields
     if (plan_name) subscription.plan_name = plan_name;
+    if (start_date) subscription.start_date = start_date;
     if (end_date) subscription.end_date = end_date;
+    if (renewal_date !== undefined) subscription.renewal_date = renewal_date;
     if (status) subscription.status = status;
     if (amount !== undefined) subscription.amount = amount;
-    if (renewal_date) subscription.renewal_date = renewal_date;
 
     await subscription.save();
 
