@@ -6,55 +6,24 @@ import { queryHelper } from "../utils/queryHelper.js";
 
 /**
  * GET /api/job-posts - Get all job posts
- * - Providers: See only approved jobs relevant to their skills
+ * - Providers: See all approved job posts (no skill filtering)
  * - Customers: See their own posts
  * - Admin: See all posts
- * - Public: Cannot access
+ * - Public: Cannot access (handled by route middleware)
  */
 export const getAllJobPosts = async (req, res, next) => {
   try {
     let defaultFilters = {};
 
     // Role-based filtering
-    if (req.user) {
-      if (req.user.role === "admin") {
-        // Admin sees all posts
-        // No default filter
-      } else if (req.user.role === "customer") {
-        // Customers see only their own posts
-        defaultFilters.posted_by = req.user.id;
-      } else if (req.user.role === "provider") {
-        // Providers see only approved jobs relevant to their skills
-        defaultFilters.status = "Approved";
-
-        // Get provider's skills
-        const provider = await Provider.findById(req.user.id).select("skills");
-        if (provider && provider.skills && provider.skills.length > 0) {
-          // Find services that match provider's skills
-          const skillRegex = provider.skills.map(
-            (skill) => new RegExp(skill, "i")
-          );
-          const matchingServices = await Service.find({
-            name: { $in: skillRegex },
-          }).select("_id");
-
-          const serviceIds = matchingServices.map((s) => s._id);
-          if (serviceIds.length > 0) {
-            defaultFilters.service_id = { $in: serviceIds };
-          } else {
-            // No matching services, return empty
-            defaultFilters.service_id = { $in: [] };
-          }
-        }
-      }
-    } else {
-      // Public users cannot access
-      return res.status(401).json({
-        success: false,
-        statusCode: 401,
-        message: "Authentication required to view job posts",
-      });
+    if (req.user.role === "provider") {
+      // Providers can see all approved job posts
+      defaultFilters.status = "Approved";
+    } else if (req.user.role === "customer") {
+      // Customers can only see their own posts
+      defaultFilters.posted_by = req.user.id;
     }
+    // Admin sees all (no default filter)
 
     const { data, pagination } = await queryHelper(
       JobPost,
