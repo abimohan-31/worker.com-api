@@ -15,14 +15,19 @@ const servicesRouter = express.Router();
 
 // Public routes (no authentication required)
 servicesRouter.get("/", getAllServices);
+servicesRouter.get("/:id", getServiceById);
 servicesRouter.get("/categories", getAllCategories);
 servicesRouter.get("/category/:category", getServicesByCategory);
 servicesRouter.get("/:id/providers", getProvidersByService); // Must be before /:id
-servicesRouter.get("/:id", getServiceById);
 
 // Providers only routes (require authentication and provider role)
-servicesRouter.post("/", verifyToken, verifyRole("provider"), createService);
-servicesRouter.put("/:id", verifyToken, verifyRole("provider"), updateService);
-servicesRouter.delete("/:id", verifyToken, verifyRole("provider"), deleteService);
+servicesRouter.post("/", verifyToken, verifyRole("admin"), createService);
+servicesRouter.put("/:id", verifyToken, verifyRole("admin"), updateService);
+servicesRouter.delete(
+  "/:id",
+  verifyToken,
+  verifyRole("admin"),
+  deleteService
+);
 
 export default servicesRouter;
