@@ -60,7 +60,6 @@ const seedAdmin = async () => {
   }
 };
 
-
 // Main seeding function
 const seedDatabase = async () => {
   try {
