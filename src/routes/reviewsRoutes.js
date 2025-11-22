@@ -7,6 +7,7 @@ import {
   updateReview,
   deleteReview,
 } from "../controllers/reviewsController.js";
+import { getReviews } from "../controllers/providersController.js";
 
 const reviewsRouter = express.Router();
 
@@ -15,8 +16,11 @@ reviewsRouter.get("/", getAllReviews);
 reviewsRouter.get("/:id", getReviewById);
 
 //customer
-reviewsRouter.post("/", createReview);
-reviewsRouter.put("/:id", updateReview);
-reviewsRouter.delete("/:id", deleteReview);
+reviewsRouter.post("/", verifyToken, verifyRole("customer"), createReview);
+reviewsRouter.put("/:id", verifyToken, verifyRole("customer"), updateReview);
+reviewsRouter.delete("/:id", verifyToken, verifyRole("customer"), deleteReview);
+
+//provider
+reviewsRouter.get("/", verifyToken, verifyRole("provider"), getReviews);
 
 export default reviewsRouter;

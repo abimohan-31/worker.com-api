@@ -4,16 +4,15 @@ import {
   verifyRole,
   verifyProviderApproval,
 } from "../middleware/authMiddleware.js";
-import { checkSubscription } from "../middleware/subscriptionMiddleware.js";
 import {
   checkApprovalStatus,
   getProfile,
   updateProfile,
   getSubscription,
-  getReviews,
   getAllProviders,
   getProviderById,
 } from "../controllers/providersController.js";
+import { applyToJobPost } from "../controllers/jobPostsController.js";
 
 const providersRouter = express.Router();
 
@@ -34,10 +33,7 @@ providersRouter.use(verifyProviderApproval);
 providersRouter.get("/profile", getProfile);
 providersRouter.put("/profile", updateProfile);
 
-// Subscription routes (no subscription required to view)
-providersRouter.get("/subscription", getSubscription);
-
-// Review routes (require active subscription)
-providersRouter.get("/reviews", checkSubscription, getReviews);
+// Job Post application route
+providersRouter.post("/job-posts/:id/apply", applyToJobPost);
 
 export default providersRouter;

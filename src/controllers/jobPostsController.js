@@ -31,7 +31,10 @@ export const getAllJobPosts = async (req, res, next) => {
         populate: [
           { path: "service_id", select: "name category description" },
           { path: "customerId", select: "name email phone" },
-          { path: "applications.providerId", select: "name email skills phone" },
+          {
+            path: "applications.providerId",
+            select: "name email skills phone",
+          },
         ],
       }
     );
@@ -160,10 +163,9 @@ export const createJobPost = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         statusCode: 400,
-        message: "Phone number is required to post jobs. Please update your profile.",
-        errors: [
-          { field: "phone", message: "Phone number is required" },
-        ],
+        message:
+          "Phone number is required to post jobs. Please update your profile.",
+        errors: [{ field: "phone", message: "Phone number is required" }],
       });
     }
 
@@ -340,7 +342,8 @@ export const applyToJobPost = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       statusCode: 200,
-      message: "Successfully applied to job post. Waiting for customer approval.",
+      message:
+        "Successfully applied to job post. Waiting for customer approval.",
       data: {
         jobPost: populatedJobPost,
       },
