@@ -22,7 +22,7 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Welcome to Clumsy to Clean API",
+    message: "Welcome to Work Bond",
   });
 });
 
