@@ -203,6 +203,11 @@ export const login = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
 
+    console.log("=== LOGIN ATTEMPT ===");
+    console.log("Email:", email);
+    console.log("Role:", role);
+    console.log("Password provided:", password ? "Yes" : "No");
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -234,10 +239,13 @@ export const login = async (req, res, next) => {
 
     // Find user based on role
     if (role === "admin") {
+      console.log("Looking for admin user...");
       user = await User.findOne({ email, role: "admin" }).select("+password");
     } else if (role === "provider") {
+      console.log("Looking for provider user...");
       user = await Provider.findOne({ email }).select("+password");
     } else if (role === "customer") {
+      console.log("Looking for customer user...");
       user = await Customer.findOne({ email }).select("+password");
     } else {
       return res.status(400).json({
@@ -249,7 +257,18 @@ export const login = async (req, res, next) => {
       });
     }
 
+    console.log("User found:", user ? "Yes" : "No");
+    if (user) {
+      console.log("User ID:", user._id);
+      console.log("User email:", user.email);
+      console.log("User has password field:", user.password ? "Yes" : "No");
+      if (role === "provider") {
+        console.log("Provider isApproved:", user.isApproved);
+      }
+    }
+
     if (!user) {
+      console.log("User not found in database");
       return res.status(401).json({
         success: false,
         statusCode: 401,
@@ -258,8 +277,12 @@ export const login = async (req, res, next) => {
     }
 
     // Verify password
+    console.log("Verifying password...");
     const isPasswordValid = await user.comparePassword(password);
+    console.log("Password valid:", isPasswordValid);
+    
     if (!isPasswordValid) {
+      console.log("Password verification failed");
       return res.status(401).json({
         success: false,
         statusCode: 401,
@@ -269,6 +292,7 @@ export const login = async (req, res, next) => {
 
     // Check provider approval
     if (role === "provider" && !user.isApproved) {
+      console.log("Provider not approved");
       return res.status(403).json({
         success: false,
         statusCode: 403,
@@ -280,6 +304,7 @@ export const login = async (req, res, next) => {
 
     // Generate token
     const token = generateToken(user._id, role);
+    console.log("Login successful, token generated");
 
     // Remove password from response
     const userData = user.toObject();
@@ -295,6 +320,7 @@ export const login = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
     next(error);
   }
 };
