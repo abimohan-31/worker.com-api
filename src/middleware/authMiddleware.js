@@ -7,7 +7,6 @@ import TokenBlacklist from "../models/TokenBlacklist.js";
 // Verify JWT token middleware
 export const verifyToken = async (req, res, next) => {
   try {
-    next()
     const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
