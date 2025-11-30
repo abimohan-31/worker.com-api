@@ -14,51 +14,39 @@ const jobPostsRouter = express.Router();
 
 // Job Posts routes (customer-owned)
 jobPostsRouter.get(
-  "/job-posts",
+  "/",
   verifyToken,
   verifyRole(["customer", "provider", "admin"]),
   getAllJobPosts
 ); // Customers see their own, providers/admin see all
 jobPostsRouter.get(
-  "/job-posts/:id",
+  "/:id",
   verifyToken,
-  verifyRole("customer", "provider"),
+  verifyRole(["customer", "provider", "admin"]),
   getJobPostById
 );
-jobPostsRouter.post(
-  "/job-posts",
-  verifyToken,
-  verifyRole("customer"),
-  createJobPost
-);
+jobPostsRouter.post("/", verifyToken, verifyRole("customer"), createJobPost);
+jobPostsRouter.put("/:id", verifyToken, verifyRole("customer"), updateJobPost);
 jobPostsRouter.put(
-  "/job-posts/:id",
-  verifyToken,
-  verifyRole("customer"),
-  updateJobPost
-); // Customer (own) or Admin (any)
-jobPostsRouter.put(
-  "/job-posts/:id/applications/:applicationId/approve",
+  "/:id/applications/:applicationId/approve",
   verifyToken,
   verifyRole("customer"),
   approveApplication
 );
 jobPostsRouter.put(
-  "/job-posts/:id/applications/:applicationId/reject",
+  "/:id/applications/:applicationId/reject",
   verifyToken,
   verifyRole("customer"),
   rejectApplication
 );
 jobPostsRouter.delete(
-  "/job-posts/:id",
+  "/:id",
   verifyToken,
   verifyRole("customer"),
   deleteJobPost
-); // Customer (own) or Admin (any)
-
-// Job Post application route
+);
 jobPostsRouter.post(
-  "/job-posts/:id/apply",
+  "/:id/apply",
   verifyToken,
   verifyRole("provider"),
   applyToJobPost
