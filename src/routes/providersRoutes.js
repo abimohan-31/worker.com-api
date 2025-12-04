@@ -18,7 +18,6 @@ import {
   updateWorkImage,
   deleteWorkImage,
   getPublicWorkImages,
-  getPublicWorkImages,
   getPendingProviders,
   getAllProvidersForAdmin,
   approveProvider,

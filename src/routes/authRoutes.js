@@ -7,7 +7,6 @@ import {
   getUserById,
   updateUser,
   deleteUser,
-  deleteUser,
   createUser,
   getAllAdmins,
 } from "../controllers/authController.js";
