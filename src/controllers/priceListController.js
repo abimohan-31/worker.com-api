@@ -5,15 +5,24 @@ import { queryHelper } from "../utils/queryHelper.js";
 /**
  * GET /api/price-list - Get all price lists (public route)
  * Supports search, filter, sort, and pagination
+ * Admin users (if authenticated) can see all price lists including inactive
  */
 export const getAllPriceLists = async (req, res, next) => {
   try {
+    // Admin users can see all price lists (active and inactive)
+    // Public users see only active price lists
+    const defaultFilters = {};
+    const isAdmin = req.user && req.user.role === "admin";
+    if (!isAdmin) {
+      defaultFilters.isActive = true;
+    }
+    
     const { data, pagination } = await queryHelper(
       PriceList,
       req.query,
       ["description"], // Search fields
       {
-        defaultFilters: { isActive: true },
+        defaultFilters,
         populate: {
           path: "service_id",
           select: "name category description",

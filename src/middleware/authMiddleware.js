@@ -103,6 +103,69 @@ export const verifyToken = async (req, res, next) => {
   }
 };
 
+// Optional token verification - doesn't fail if no token, but sets req.user if token is valid
+// Useful for public routes that need to check if user is admin for enhanced features
+export const optionalVerifyToken = async (req, res, next) => {
+  try {
+    // Try to get token from cookie first (preferred method)
+    let token = req.cookies?.access_token;
+    
+    // Fallback to Authorization header if no cookie
+    if (!token) {
+      token = req.header("Authorization")?.replace("Bearer ", "");
+    }
+
+    // If no token, continue without setting req.user (public access)
+    if (!token) {
+      return next();
+    }
+
+    // Check if token is blacklisted (logged out)
+    const blacklistedToken = await TokenBlacklist.findOne({ token });
+    if (blacklistedToken) {
+      // Token is blacklisted, continue as public user
+      return next();
+    }
+
+    // Verify token
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your-secret-key"
+    );
+
+    // Find user based on role
+    let user = null;
+    if (decoded.role === "provider") {
+      user = await Provider.findById(decoded.id);
+    } else if (decoded.role === "customer") {
+      user = await Customer.findById(decoded.id);
+    } else if (decoded.role === "admin") {
+      user = await User.findById(decoded.id);
+    }
+
+    if (user) {
+      // Attach user details to request
+      req.user = {
+        id: user._id.toString(),
+        role: decoded.role,
+        email: user.email,
+        name: user.name,
+      };
+
+      // For providers, also attach approval status
+      if (decoded.role === "provider") {
+        req.user.isApproved = user.isApproved;
+      }
+    }
+
+    next();
+  } catch (error) {
+    // If token verification fails, continue as public user (don't fail the request)
+    // This allows public routes to work even with invalid/expired tokens
+    next();
+  }
+};
+
 // Role-based authorization middleware (accepts single role or array of roles)
 export const verifyRole = (...allowedRoles) => {
   return (req, res, next) => {

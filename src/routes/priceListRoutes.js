@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, verifyRole } from "../middleware/authMiddleware.js";
+import { verifyToken, verifyRole, optionalVerifyToken } from "../middleware/authMiddleware.js";
 import {
   getAllPriceLists,
   getPriceListByService,
@@ -11,8 +11,8 @@ import {
 
 const priceListRouter = express.Router();
 
-// Public routes (no authentication required)
-priceListRouter.get("/", getAllPriceLists);
+// Public routes with optional auth (admin can see all price lists if authenticated)
+priceListRouter.get("/", optionalVerifyToken, getAllPriceLists);
 priceListRouter.get("/service/:serviceId", getPriceListByService);
 priceListRouter.get("/:id", getPriceListById);
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, verifyRole } from "../middleware/authMiddleware.js";
+import { verifyToken, verifyRole, optionalVerifyToken } from "../middleware/authMiddleware.js";
 import {
   getAllServices,
   getAllCategories,
@@ -13,8 +13,8 @@ import {
 
 const servicesRouter = express.Router();
 
-// Public routes (no authentication required)
-servicesRouter.get("/", getAllServices);
+// Public routes with optional auth (admin can see all services if authenticated)
+servicesRouter.get("/", optionalVerifyToken, getAllServices);
 servicesRouter.get("/:id", getServiceById);
 // servicesRouter.get("/categories", getAllCategories);
 // servicesRouter.get("/category/:category", getServicesByCategory);

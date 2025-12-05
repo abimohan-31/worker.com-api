@@ -6,11 +6,16 @@ import { queryHelper } from "../utils/queryHelper.js";
 
 // GET /api/services - Get all services (public route)
 // Supports search, filter, sort, and pagination
+// Admin users (if authenticated) can see all services including inactive
 export const getAllServices = async (req, res, next) => {
   try {
     // Set default filter for active services if not specified
+    // Admin users can see all services (active and inactive) by not filtering
     const defaultFilters = {};
-    if (req.query.isActive === undefined) {
+    // Check if user is authenticated admin - if so, show all services
+    // Otherwise, default to active services only
+    const isAdmin = req.user && req.user.role === "admin";
+    if (req.query.isActive === undefined && !isAdmin) {
       defaultFilters.isActive = true;
     }
 
