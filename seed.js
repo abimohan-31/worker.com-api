@@ -52,7 +52,7 @@ const seedAdmin = async () => {
     });
 
     await admin.save();
-    console.log(`Admin created: ${admin.email} (password: admin0004)`);
+    console.log(`Admin created: ${admin.email} (password: Admin@123)`);
     return admin;
   } catch (error) {
     console.error("Error seeding admin:", error);
@@ -83,7 +83,7 @@ const seedDatabase = async () => {
     console.log("=".repeat(50));
     console.log(" Database seeded successfully!");
     console.log(" Test Credentials:");
-    console.log(" Admin : admin@gmail.com /admin0004");
+    console.log(" Admin : admin@gmail.com /Admin@123");
     console.log("");
 
     // Close connection
