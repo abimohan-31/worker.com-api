@@ -8,7 +8,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "seed": "NODE_ENV=development node seed.js",
-    "seed:Auth": "node seedUser.js"
+    "seed:Auth": "node seedUsers.js"
   },
   "author": "Abi Mohan",
   "license": "ISC",
